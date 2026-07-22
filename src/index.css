@@ -1,0 +1,705 @@
+/* ============================================================
+   citation_needed - LAYOUT ONLY.
+
+   The window chrome + every control (buttons, inputs, selects,
+   textareas, fieldsets, title bars, scrollbars) come from the real
+   replica stylesheets 98.css / XP.css / 7.css, loaded one-at-a-time
+   into <style id="os-theme"> by src/lib/theme.ts (keyed off the
+   <html data-os> attribute). This file only styles the pieces those
+   libraries DON'T ship: the desktop, the taskbar + Start menu, the
+   results list, the DR meter, and a couple of inset panels - each
+   themed per-OS to sit naturally next to the active library.
+
+   Tailwind is intentionally absent: its preflight would load after the
+   swapped library <style> and strip the libs' bare button/input rules.
+   ============================================================ */
+
+:root {
+  --navy: #000080; /* title-bar tint for 95/98; recolored by the scheme picker */
+  --desktop: #008080; /* desktop background; recolored by the scheme picker */
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  margin: 0;
+  background-color: var(--desktop);
+  background-image: linear-gradient(rgba(0, 0, 0, 0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.13) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+/* ---- Title-bar tint (keeps the color-scheme picker live on 95/98) ----
+   XP/7 keep their signature blues; we only retint the flat/gradient eras. */
+:root[data-os='95'] .title-bar {
+  background: var(--navy);
+}
+:root[data-os='98'] .title-bar {
+  background: linear-gradient(90deg, var(--navy), color-mix(in srgb, var(--navy) 45%, #4fb3ff));
+}
+
+/* ---- App logo badge (the [*] mark) - title bar + taskbar button ----
+   One DOM-text mark; the FRAME (radius, bevel, gloss) is restyled per era
+   so it reads native instead of a flat 8-bit square. Brand indigo stays. */
+.win-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-right: 5px;
+  flex: 0 0 auto;
+}
+.app-badge {
+  width: 16px;
+  height: 16px;
+}
+.app-badge-mark {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  font: 700 10px/1 ui-monospace, 'Courier New', monospace;
+  color: #fff;
+  background: #4f46e5;
+}
+:root[data-os='95'] .app-badge-mark {
+  border-radius: 0;
+  box-shadow: inset -1px -1px rgba(0, 0, 0, 0.55), inset 1px 1px rgba(255, 255, 255, 0.5);
+}
+:root[data-os='98'] .app-badge-mark {
+  border-radius: 1px;
+  box-shadow: inset -1px -1px rgba(0, 0, 0, 0.45), inset 1px 1px rgba(255, 255, 255, 0.55);
+}
+:root[data-os='xp'] .app-badge-mark {
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 45%), #4f46e5;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.25), 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+:root[data-os='7'] .app-badge-mark {
+  border-radius: 5px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #6366f1, #3730a3);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 0 3px rgba(120, 160, 255, 0.45);
+}
+
+/* ---- Section tabs (Find Links / History) ---- */
+.tab-bar {
+  display: flex;
+  gap: 3px;
+  margin-bottom: 8px;
+}
+button.is-active {
+  font-weight: 700;
+}
+:root[data-os='95'] button.is-active,
+:root[data-os='98'] button.is-active {
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf,
+    inset 2px 2px grey !important;
+}
+:root[data-os='xp'] button.is-active {
+  background: linear-gradient(180deg, #fff, #ecebe5 86%, #d8d0c4) !important;
+  box-shadow: inset 0 -2px 0 #2a6dd3 !important;
+}
+:root[data-os='7'] button.is-active {
+  box-shadow: inset 0 0 0 1px #fff, inset 0 -2px 0 #3c7fb1 !important;
+}
+
+/* ============================================================
+   DR meter - a segmented authority bar. The libs disagree on the
+   progress contract (98 = .progress-indicator, XP = <progress>,
+   7 = none), so we render one element and match each era by hand.
+   ============================================================ */
+.dr-meter-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dr-meter {
+  flex: 1;
+  min-width: 0;
+  height: 14px;
+  background: #fff;
+  box-shadow: inset 1px 1px grey, inset -1px -1px #fff;
+  padding: 2px;
+  overflow: hidden;
+}
+.dr-meter > i {
+  display: block;
+  height: 100%;
+  background-image: linear-gradient(90deg, var(--navy) 0 7px, transparent 7px 9px);
+  background-repeat: repeat;
+  background-size: 9px 100%;
+}
+.dr-meter-num {
+  width: 18px;
+  text-align: right;
+}
+/* XP - segmented Luna green */
+:root[data-os='xp'] .dr-meter {
+  background: #fff;
+  border: 1px solid #686868;
+  border-radius: 4px;
+  box-shadow: none;
+  padding: 1px;
+}
+:root[data-os='xp'] .dr-meter > i {
+  border-radius: 2px;
+  background-size: auto;
+  background-image: repeating-linear-gradient(90deg, #fff 0, #fff 2px, transparent 0, transparent 10px),
+    linear-gradient(
+      180deg,
+      #acedad,
+      #7be47d 14%,
+      #4cda50 28%,
+      #2ed330 42%,
+      #42d845 57%,
+      #76e275 71%,
+      #8fe791 85%,
+      #fff
+    );
+}
+/* Win7 - glossy Aero green */
+:root[data-os='7'] .dr-meter {
+  background: #dddddd;
+  border: 1px solid #8e8f8f;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgba(243, 243, 243, 0.6);
+  padding: 1px;
+}
+:root[data-os='7'] .dr-meter > i {
+  border-radius: 2px;
+  background-color: #0bd82c;
+  background-image: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.55),
+      rgba(255, 255, 255, 0.15) 45%,
+      transparent 50%
+    ),
+    linear-gradient(180deg, transparent 65%, rgba(255, 255, 255, 0.4));
+}
+
+/* ============================================================
+   XP de-pixelation - xp.css puts a traced 9x bitmap font
+   ("Pixelated MS Sans Serif") on its controls. The tracing is
+   only crisp at 100% browser zoom; at 125/150% the pixel-square
+   edges land on fractional device pixels and turn ragged. Real
+   Luna used ClearType Tahoma - vector, crisp at any zoom - so XP
+   gets Tahoma here. (95/98 keep the bitmap font: it IS the look;
+   record those at 100% or 200% where the tracing stays sharp.
+   Win7 already uses vector Calibri/Segoe.)
+   ============================================================ */
+:root[data-os='xp'] body,
+:root[data-os='xp'] button,
+:root[data-os='xp'] input,
+:root[data-os='xp'] label,
+:root[data-os='xp'] textarea,
+:root[data-os='xp'] select,
+:root[data-os='xp'] option,
+:root[data-os='xp'] ul.tree-view,
+:root[data-os='xp'] .status-bar-field {
+  font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+}
+
+/* ============================================================
+   Run progress - full-width variant of the DR meter, shown while
+   a run (or the demo replay) is working. Skins come free from the
+   .dr-meter per-OS rules above.
+   ============================================================ */
+.run-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.run-progress-phase {
+  flex-shrink: 0;
+  min-width: 158px;
+  font-size: 11px;
+}
+.dr-meter.run-progress-bar {
+  height: 17px;
+}
+.run-progress-num {
+  flex-shrink: 0;
+  width: 34px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   Replace flash - the row a replacement lands in blinks like a
+   classic Explorer refresh: highlight on, off, on, fade. The
+   text is fully opaque from the very first frame (an earlier
+   version faded content in from opacity 0, which read as input
+   lag on screen recordings). Era colours: titlebar navy on
+   95/98, Luna blue on XP, Aero blue on 7.
+   ============================================================ */
+@keyframes lv-replaced {
+  0%,
+  30% {
+    background: color-mix(in srgb, var(--navy) 38%, transparent);
+  }
+  45% {
+    background: transparent;
+  }
+  60% {
+    background: color-mix(in srgb, var(--navy) 38%, transparent);
+  }
+  100% {
+    background: transparent;
+  }
+}
+.lv-row.lv-row-flash {
+  animation: lv-replaced 0.55s linear both;
+}
+@keyframes lv-replaced-xp {
+  0%,
+  30% {
+    background: rgba(49, 106, 197, 0.4);
+  }
+  45% {
+    background: transparent;
+  }
+  60% {
+    background: rgba(49, 106, 197, 0.4);
+  }
+  100% {
+    background: transparent;
+  }
+}
+:root[data-os='xp'] .lv-row.lv-row-flash {
+  animation-name: lv-replaced-xp;
+}
+@keyframes lv-replaced-7 {
+  0%,
+  30% {
+    background: rgba(51, 153, 255, 0.35);
+  }
+  45% {
+    background: transparent;
+  }
+  60% {
+    background: rgba(51, 153, 255, 0.35);
+  }
+  100% {
+    background: transparent;
+  }
+}
+:root[data-os='7'] .lv-row.lv-row-flash {
+  animation-name: lv-replaced-7;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lv-row.lv-row-flash {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Results list - a sortable grid the libs have no component for.
+   ============================================================ */
+.listview {
+  background: #fff;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+  overflow: auto;
+}
+.lv-head > span {
+  background: #c0c0c0;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf;
+  padding: 3px 8px;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
+}
+.lv-row > span {
+  padding: 3px 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Source cell: readable page title over a compact URL - no long-URL clipping. */
+.lv-row .lv-source {
+  white-space: normal;
+  min-width: 0;
+  line-height: 1.2;
+}
+.lv-src-title,
+.lv-src-url {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lv-src-url {
+  font-size: 10px;
+  color: #6a6a6a;
+}
+:root[data-os='xp'] .listview {
+  box-shadow: none;
+  border: 1px solid #7f9db9;
+}
+:root[data-os='xp'] .lv-head > span {
+  background: linear-gradient(180deg, #fbfbfa, #ece9da);
+  box-shadow: none;
+  border: 1px solid #d6d2c2;
+  border-left: 0;
+}
+:root[data-os='7'] .listview {
+  box-shadow: none;
+  border: 1px solid #cdd7db;
+}
+:root[data-os='7'] .lv-head > span {
+  background: linear-gradient(180deg, #fefefe, #f0f0f0);
+  box-shadow: none;
+  border: 1px solid #e3e3e3;
+  border-left: 0;
+  color: #444;
+}
+
+/* ---- Inset panels (run console, info strips) ---- */
+.sunken {
+  background: #fff;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+}
+.sunken-thin {
+  box-shadow: inset 1px 1px grey, inset -1px -1px #fff;
+}
+:root[data-os='xp'] .sunken,
+:root[data-os='7'] .sunken {
+  box-shadow: none;
+  border: 1px solid #b5b5b5;
+}
+:root[data-os='xp'] .sunken-thin,
+:root[data-os='7'] .sunken-thin {
+  box-shadow: none;
+  border: 1px solid #c8c8c8;
+}
+
+/* ============================================================
+   Taskbar + Start menu - the libs ship none, so it's all ours.
+   Start / window buttons are <div role=button> so the libs' bare
+   `button` selector never reaches them. Each era is themed in full:
+   95/98 raised silver, XP Luna blue + green Start, Win7 Aero glass.
+   Base = Windows 95/98.
+   ============================================================ */
+.taskbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 4px;
+  background: #c0c0c0;
+  box-shadow: inset 0 1px 0 #fff, inset 0 2px 0 #dfdfdf;
+  border-top: 1px solid #fff;
+  color: #000;
+  font-family: 'Pixelated MS Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  user-select: none;
+}
+.taskbar .start,
+.taskbar .taskwin {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-weight: 700;
+  padding: 3px 9px;
+  cursor: pointer;
+  color: inherit;
+}
+.taskbar .start {
+  background: #c0c0c0;
+  box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf;
+}
+.taskbar .start:active {
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px grey;
+}
+.taskbar .taskwin {
+  box-shadow: inset 1px 1px grey, inset -1px -1px #fff;
+}
+/* the focused window's taskband button: pressed-in well + faint dither */
+:root[data-os='95'] .taskbar .taskwin.is-active,
+:root[data-os='98'] .taskbar .taskwin.is-active {
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px grey;
+  background: repeating-conic-gradient(from 0deg at 0 0, #c0c0c0 0deg 90deg, #cccccc 90deg 180deg) 0 0 / 2px 2px;
+}
+.start-flag {
+  display: grid;
+  grid-template-columns: 5px 5px;
+  grid-template-rows: 5px 5px;
+  gap: 1px;
+  flex: 0 0 auto;
+}
+.start-flag > span {
+  display: block;
+}
+.start-orb {
+  display: none;
+}
+.tray {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 3px 8px;
+  background: #c0c0c0;
+  box-shadow: inset -1px -1px #fff, inset 1px 1px #808080, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+}
+.clock {
+  border-left: 1px solid #808080;
+  box-shadow: inset 1px 0 0 #fff;
+  padding-left: 8px;
+}
+
+/* tech-tray icons - bare vectors, era-finished */
+.tray-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.tray-ico {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.tray-ico svg {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+.tray-mark {
+  font: 700 10px/1 Arial, sans-serif;
+}
+:root[data-os='95'] .tray-ico svg,
+:root[data-os='98'] .tray-ico svg {
+  shape-rendering: crispEdges;
+}
+
+/* ---- Taskbar: Windows XP (Luna) ---- */
+:root[data-os='xp'] .taskbar {
+  height: 30px;
+  background: linear-gradient(to bottom, #4d8bf0 0%, #3168d5 3%, #2f66cf 6%, #2a5ed4 90%, #1941a5 100%);
+  box-shadow: inset 0 1px 0 #5a9bf0, inset 0 2px 1px rgba(255, 255, 255, 0.35);
+  border-top: none;
+  color: #fff;
+  font-family: Tahoma, 'Segoe UI', sans-serif;
+  font-size: 12px;
+}
+:root[data-os='xp'] .taskbar .start {
+  background: linear-gradient(to bottom, #3f9b40 0%, #388238 8%, #307b35 45%, #2a7c30 50%, #36983a 80%, #44ad48 100%);
+  color: #fff;
+  box-shadow: none;
+  border-radius: 0 9px 9px 0;
+  font: italic 700 16px 'Trebuchet MS', Tahoma, sans-serif;
+  text-shadow: 1px 1px 1px #1a5d1a;
+  padding: 2px 18px 2px 8px;
+}
+:root[data-os='xp'] .start-label {
+  text-transform: lowercase;
+}
+:root[data-os='xp'] .taskbar .start:active {
+  filter: brightness(0.95);
+}
+:root[data-os='xp'] .taskbar .taskwin {
+  font-weight: 400;
+  border: 1px solid #1e52c4;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, #3c81f3 0%, #2c5fd0 10%, #2755c4 50%, #2a64d6 90%, #1f50bb 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+:root[data-os='xp'] .taskbar .taskwin.is-active {
+  background: linear-gradient(to bottom, #1c47a8, #2858c8);
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+:root[data-os='xp'] .tray {
+  background: linear-gradient(to bottom, #16adf0 0%, #1486dd 50%, #1580d9 100%);
+  box-shadow: inset 1px 0 0 #0c3aa0, inset 2px 0 0 #4a90e2;
+  color: #fff;
+}
+:root[data-os='xp'] .clock {
+  border-left-color: rgba(255, 255, 255, 0.4);
+  box-shadow: none;
+  text-shadow: 1px 1px #0f3d8a;
+}
+:root[data-os='xp'] .tray-ico {
+  width: 17px;
+  height: 17px;
+}
+:root[data-os='xp'] .tray-ico svg {
+  width: 15px;
+  height: 15px;
+  shape-rendering: geometricPrecision;
+}
+
+/* ---- Taskbar: Windows 7 (Aero glass) ---- */
+:root[data-os='7'] .taskbar {
+  height: 40px;
+  /* translucent Aero glass tinted to the window's #4580c4, so taskbar + window
+     read as the same glass (not an opaque black bar) */
+  background: linear-gradient(
+      to bottom,
+      rgba(190, 219, 246, 0.62) 0%,
+      rgba(104, 156, 213, 0.5) 9%,
+      rgba(66, 113, 176, 0.46) 49%,
+      rgba(54, 100, 162, 0.5) 51%,
+      rgba(104, 156, 213, 0.56) 100%
+    ),
+    rgba(69, 128, 196, 0.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), inset 0 2px 2px rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28);
+  border-top: 1px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+  text-shadow: 0 1px 1px rgba(0, 0, 40, 0.45);
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-size: 12px;
+}
+:root[data-os='7'] .taskbar .start {
+  width: 46px;
+  height: 40px;
+  min-width: 46px;
+  padding: 0;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  overflow: visible;
+}
+:root[data-os='7'] .taskbar .start:hover .start-orb {
+  filter: drop-shadow(0 0 6px rgba(120, 200, 255, 0.75));
+}
+:root[data-os='7'] .start-flag,
+:root[data-os='7'] .start-label {
+  display: none;
+}
+:root[data-os='7'] .start-orb {
+  display: block;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  margin: 0 auto;
+  position: relative;
+  top: -3px;
+}
+:root[data-os='7'] .taskbar .taskwin {
+  height: 34px;
+  font-weight: 400;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+  border-radius: 3px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.06) 49%,
+    rgba(255, 255, 255, 0.02) 51%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), inset 0 0 6px rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+:root[data-os='7'] .taskbar .taskwin:hover {
+  background: linear-gradient(to bottom, rgba(140, 200, 255, 0.35), rgba(80, 150, 220, 0.2));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.5), 0 0 8px rgba(120, 190, 255, 0.5);
+}
+:root[data-os='7'] .tray {
+  background: transparent;
+  box-shadow: none;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+}
+:root[data-os='7'] .clock {
+  border-left-color: rgba(255, 255, 255, 0.25);
+  box-shadow: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+:root[data-os='7'] .tray-ico svg {
+  shape-rendering: geometricPrecision;
+  filter: drop-shadow(0 0 1px rgba(180, 210, 255, 0.5));
+}
+:root[data-os='7'] .tray-mark {
+  text-shadow: 0 0 2px rgba(180, 210, 255, 0.6);
+}
+
+/* ============================================================
+   Desktop shortcut icon - the app logo sitting on the desktop,
+   like a classic Windows program shortcut. Focusable: clicking it
+   shows the selected highlight (clicking elsewhere deselects).
+   ============================================================ */
+.desktop-icon {
+  position: fixed;
+  top: 22px;
+  left: 22px;
+  z-index: 1;
+  width: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px 5px;
+  text-align: center;
+  cursor: default;
+  user-select: none;
+  border: 1px dotted transparent;
+  font-family: 'Segoe UI', Tahoma, 'Pixelated MS Sans Serif', sans-serif;
+}
+.desktop-icon:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(11, 79, 165, 0.4);
+}
+/* Only show it when the centered window leaves desktop room beside it. */
+@media (max-width: 1040px) {
+  .desktop-icon {
+    display: none;
+  }
+}
+.desktop-icon-badge {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  font: 700 22px/1 ui-monospace, 'Courier New', monospace;
+  color: #fff;
+  background: #4f46e5;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.3),
+    inset 0 14px 12px -10px rgba(255, 255, 255, 0.55);
+}
+.desktop-icon-label {
+  font-size: 12px;
+  line-height: 1.15;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85), 0 0 3px rgba(0, 0, 0, 0.6);
+}
+.desktop-icon:focus .desktop-icon-label {
+  text-shadow: none;
+}
+/* per-era badge finish - flat square on 95/98, glossy rounded on XP/7 */
+:root[data-os='95'] .desktop-icon-badge,
+:root[data-os='98'] .desktop-icon-badge {
+  border-radius: 0;
+  box-shadow: inset -1px -1px rgba(0, 0, 0, 0.5), inset 1px 1px rgba(255, 255, 255, 0.5),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+:root[data-os='xp'] .desktop-icon-badge {
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 45%), #4f46e5;
+}
+:root[data-os='7'] .desktop-icon-badge {
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.12) 48%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #6366f1, #3730a3);
+}

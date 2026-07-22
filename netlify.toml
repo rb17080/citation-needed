@@ -1,0 +1,21 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[functions]
+  node_bundler = "esbuild"
+  # cheerio is pulled in by link-health; make sure it bundles.
+  external_node_modules = []
+
+# The Anthropic proxy must STREAM the response body through (buffering it would
+# break SSE). Edge functions can return a streaming Response; classic functions
+# historically cannot — so Anthropic runs as an edge function.
+[[edge_functions]]
+  path = "/api/anthropic"
+  function = "anthropic"
+
+# SPA fallback so client-side view switching works on deep links.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
